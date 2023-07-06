@@ -1,13 +1,16 @@
 name: 'Push latest tag'
 on: [push, pull_request]
 jobs:
-  tag:
+  push_tag:
     name: 'Push latest tag'
     runs-on: ubuntu-latest
-    environment: 
-      name: test
-      url: 'https://github.com/'
     steps:
+    - name: Debug
+      run: |
+        echo $GITHUB_SHA
+        echo $GITHUB_REPOSITORY
+        echo $GITHUB_WORKSPACE
+        echo "${{ github.token }}"
       - uses: actions/checkout@v3
       - name: Move the tag to the latest commit on main
         run: |

@@ -124,7 +124,7 @@ If (-Not (Test-Path $LCU_EXE)) {
     & $RCS_EXE $RCS_ARGS
     Start-Sleep 5
 
-    $attempts = 15
+    #$attempts = 15
     While ($True) {
         $status = Invoke-RiotRequest $RCS_LOCKFILE "/patch/v1/installs/$LOL_INSTALL_ID/status"
         If ('up_to_date' -Eq $status.patch.state) {
@@ -132,10 +132,10 @@ If (-Not (Test-Path $LCU_EXE)) {
         }
         Write-Host "Installing LoL: $($status.patch.progress.progress)%"
 
-        If ($attempts -Le 0) {
-            Throw 'Failed to install LoL.'
-        }
-        $attempts--
+        #If ($attempts -Le 0) {
+        #    Throw 'Failed to install LoL.'
+        #}
+        #$attempts--
         Start-Sleep 20
     }
     Write-Host 'LoL installed successfully.'
@@ -155,11 +155,16 @@ Try {
     Start-Sleep 5
 
     # Login to RCS to start the LCU.
-    Write-Host 'Logging into RCS, starts LCU.'
+    Write-Host 'Logging into RCS.'
     Invoke-RiotRequest $RCS_LOCKFILE '/rso-auth/v1/authorization/gas' 'POST' @{username=$env:LOL_USERNAME; password=$env:LOL_PASSWORD} | Out-Null
+    Start-Sleep 10
 
+    Write-Host 'Starting the LCU (again).'
+	& $LCU_EXE $LCU_ARGS
+    Start-Sleep 10
+	
     # Wait for LCU to update itself.
-    Start-Sleep 5
+    Write-Host 'TEST1'
     Invoke-RiotRequest $LCU_LOCKFILE '/lol-patch/v1/products/league_of_legends/state' # Burn first request.
     Start-Sleep 10
     $attempts = 40

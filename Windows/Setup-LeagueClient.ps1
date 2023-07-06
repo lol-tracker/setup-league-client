@@ -159,12 +159,15 @@ Try {
     Invoke-RiotRequest $RCS_LOCKFILE '/rso-auth/v1/authorization/gas' 'POST' @{username=$env:LOL_USERNAME; password=$env:LOL_PASSWORD} | Out-Null
     Start-Sleep 10
 
-    Write-Host 'Starting the LCU (again).'
+    Write-Host 'Starting the LCU (first time).'
 	& $LCU_EXE $LCU_ARGS
-    Start-Sleep 10
+    Start-Sleep 5
+	
+    Write-Host 'Starting the LCU (last time).'
+	& $LCU_EXE $LCU_ARGS
+    Start-Sleep 15
 	
     # Wait for LCU to update itself.
-    Write-Host 'TEST1'
     Invoke-RiotRequest $LCU_LOCKFILE '/lol-patch/v1/products/league_of_legends/state' # Burn first request.
     Start-Sleep 10
     $attempts = 40

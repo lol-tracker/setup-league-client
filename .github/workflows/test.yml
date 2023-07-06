@@ -8,7 +8,7 @@ jobs:
     steps:
       - name: Setup the League Client
         id: league-client
-        uses: lol-tracker/setup-league-client@ad29abe
+        uses: lol-tracker/setup-league-client@ad29abe108f4a41b95f1fe5ce757c0798a2104cd
         with:
           username: ${{ secrets.LOL_USERNAME }}
           password: ${{ secrets.LOL_PASSWORD }}

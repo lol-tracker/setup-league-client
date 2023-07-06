@@ -4,6 +4,9 @@ jobs:
   tag:
     name: 'Push latest tag'
     runs-on: ubuntu-latest
+    environment: 
+      name: test
+      url: 'https://github.com/'
     steps:
       - uses: actions/checkout@v3
       - name: Move the tag to the latest commit on main

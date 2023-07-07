@@ -179,7 +179,7 @@ Try {
     # Wait for LCU to update itself.
     Invoke-RiotRequest $LCU_LOCKFILE '/lol-patch/v1/products/league_of_legends/state' # Burn first request.
     Start-Sleep 10
-    $attempts = 40
+    $attempts = 50
     While ($True) {
         $state = Invoke-RiotRequest $LCU_LOCKFILE '/lol-patch/v1/products/league_of_legends/state'
         Write-Host "LCU updating: $($state.action)" # Not that useful.
@@ -197,12 +197,20 @@ Try {
 
 }
 
+$lockContent = Get-Content $RCS_LOCKFILE -Raw
+$lockContent = $lockContent.Split(':')
+$port = $lockContent[2];
+$pass = $lockContent[3];
+echo "rcs-password=$pass" >> $env:GITHUB_OUTPUT
+echo "rcs-port=$port" >> $env:GITHUB_OUTPUT
+echo "rcs-directory=$RCS_DIR" >> $env:GITHUB_OUTPUT
+
 $lockContent = Get-Content $LCU_LOCKFILE -Raw
 $lockContent = $lockContent.Split(':')
 $port = $lockContent[2];
 $pass = $lockContent[3];
-Write-Host "::set-output name=lcu-password::$pass"
-Write-Host "::set-output name=lcu-port::$port"
-Write-Host "::set-output name=lcu-directory::$LCU_DIR"
+echo "lcu-password=$pass" >> $env:GITHUB_OUTPUT
+echo "lcu-port=$port" >> $env:GITHUB_OUTPUT
+echo "lcu-directory=$LCU_DIR" >> $env:GITHUB_OUTPUT
 
 Write-Host 'Success!'

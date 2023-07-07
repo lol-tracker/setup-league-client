@@ -40,6 +40,10 @@ $LCU_LOCKFILE = "$LCU_DIR\lockfile"
 $LCU_EXE = "$LCU_DIR\LeagueClient.exe"
 $LCU_ARGS = "--region=$REGION_UPPER"
 
+$PATCHER_PATH = "$env:TEMP\lcu-patcher.zip"
+$PATCHER_DIR = "$env:TEMP\lcu-patcher"
+$PATCHER_EXE = "$PATCHER_DIR\lcu-patcher.exe"
+
 $LOL_INSTALL_ID = 'league_of_legends.live'
 
 function Stop-RiotProcesses {
@@ -159,11 +163,16 @@ Try {
     Invoke-RiotRequest $RCS_LOCKFILE '/rso-auth/v1/authorization/gas' 'POST' @{username=$env:LOL_USERNAME; password=$env:LOL_PASSWORD} | Out-Null
     Start-Sleep 10
 
-    Write-Host 'Starting the LCU (first time).'
+    Write-Host 'Flashing the LCU.'
 	& $LCU_EXE $LCU_ARGS
-    Start-Sleep 5
+    Start-Sleep 1
 	
-    Write-Host 'Starting the LCU (last time).'
+	Write-Host 'Downloading lcu-patcher...'
+	Invoke-WebRequest 'https://github.com/lol-tracker/lcu-patcher/releases/download/release/lcu-patcher-win64.zip' -OutFile $PATCHER_PATH
+	Expand-Archive $PATCHER_PATH -DestinationPath $PATCHER_DIR -Force
+	& $PATCHER_EXE $LCU_EXE
+	
+    Write-Host 'Starting the LCU.'
 	& $LCU_EXE $LCU_ARGS
     Start-Sleep 15
 	

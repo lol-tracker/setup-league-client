@@ -17,6 +17,11 @@ inputs:
     description: 'The region of the League of Legends account, e.g. "NA".'
     required: true
     type: string
+  full-install:
+    description: 'Wait untill full game installation?'
+    required: false
+    default: false
+    type: string
 outputs:
   rcs-password:
     description: "The Riot Client Session Password. It's NOT your account password."
@@ -55,3 +60,4 @@ runs:
         LOL_USERNAME: ${{ inputs.username }}
         LOL_PASSWORD: ${{ inputs.password }}
         LOL_REGION: ${{ inputs.region }}
+        FULL_INSTALL: ${{ inputs.full-install }}

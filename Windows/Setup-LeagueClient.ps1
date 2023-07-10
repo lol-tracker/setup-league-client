@@ -27,6 +27,8 @@ SOFTWARE.
 $REGION_LOWER = $env:LOL_REGION.ToLower()
 $REGION_UPPER = $env:LOL_REGION.ToUpper()
 
+$FULL_INSTALL = $env:FULL_INSTALL
+
 # Config.
 $INSTALLER_EXE = "$env:RUNNER_TEMP\install.$REGION_LOWER.exe"
 
@@ -175,23 +177,25 @@ Try {
     Write-Host 'Starting the LCU.'
 	& $LCU_EXE $LCU_ARGS
     Start-Sleep 15
-	
-    # Wait for LCU to update itself.
-    Invoke-RiotRequest $LCU_LOCKFILE '/lol-patch/v1/products/league_of_legends/state' # Burn first request.
-    Start-Sleep 10
-    $attempts = 50
-    While ($True) {
-        $state = Invoke-RiotRequest $LCU_LOCKFILE '/lol-patch/v1/products/league_of_legends/state'
-        Write-Host "LCU updating: $($state.action)" # Not that useful.
-        If ('Idle' -Eq $state.action) {
-            Break
-        }
 
-        If ($attempts -le 0) {
-            Throw 'LCU failed to update.'
+    If ($FULL_INSTALL) {
+        # Wait for LCU to update itself.
+        Invoke-RiotRequest $LCU_LOCKFILE '/lol-patch/v1/products/league_of_legends/state' # Burn first request.
+        Start-Sleep 10
+        $attempts = 50
+        While ($True) {
+            $state = Invoke-RiotRequest $LCU_LOCKFILE '/lol-patch/v1/products/league_of_legends/state'
+            Write-Host "LCU updating: $($state.action)" # Not that useful.
+            If ('Idle' -Eq $state.action) {
+                Break
+            }
+
+            If ($attempts -le 0) {
+                Throw 'LCU failed to update.'
+            }
+            $attempts--
+            Start-Sleep 20
         }
-        $attempts--
-        Start-Sleep 20
     }
 } Finally {
 

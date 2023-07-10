@@ -203,6 +203,7 @@ Try {
 }
 
 $version = Invoke-RiotRequest $LCU_LOCKFILE '/lol-patch/v1/game-version'
+Write-Host "lol-version = $version"
 echo "lol-version=$version" >> $env:GITHUB_OUTPUT
 
 $lockContent = Get-Content $RCS_LOCKFILE -Raw

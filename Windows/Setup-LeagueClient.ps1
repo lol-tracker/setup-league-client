@@ -180,7 +180,7 @@ Try {
 
     Invoke-RiotRequest $LCU_LOCKFILE '/lol-patch/v1/products/league_of_legends/state' # Burn first request.
     Start-Sleep 10
-    
+
     If ($FULL_INSTALL -Eq $True) {
         # Wait for LCU to update itself.
         $attempts = 50
@@ -201,9 +201,6 @@ Try {
 } Finally {
 
 }
-
-$version = Invoke-RiotRequest $LCU_LOCKFILE '/lol-patch/v1/products/league_of_legends/state'
-echo "lol-version=$version" >> $env:GITHUB_OUTPUT
 
 $lockContent = Get-Content $RCS_LOCKFILE -Raw
 $lockContent = $lockContent.Split(':')

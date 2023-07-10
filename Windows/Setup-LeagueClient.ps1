@@ -27,7 +27,7 @@ SOFTWARE.
 $REGION_LOWER = $env:LOL_REGION.ToLower()
 $REGION_UPPER = $env:LOL_REGION.ToUpper()
 
-$FULL_INSTALL = $env:FULL_INSTALL == 'true'
+$FULL_INSTALL = $env:FULL_INSTALL -Eq 'true'
 
 # Config.
 $INSTALLER_EXE = "$env:RUNNER_TEMP\install.$REGION_LOWER.exe"

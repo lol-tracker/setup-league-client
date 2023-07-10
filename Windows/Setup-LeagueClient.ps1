@@ -178,10 +178,11 @@ Try {
 	& $LCU_EXE $LCU_ARGS
     Start-Sleep 15
 
+    Invoke-RiotRequest $LCU_LOCKFILE '/lol-patch/v1/products/league_of_legends/state' # Burn first request.
+    Start-Sleep 10
+    
     If ($FULL_INSTALL -Eq $True) {
         # Wait for LCU to update itself.
-        Invoke-RiotRequest $LCU_LOCKFILE '/lol-patch/v1/products/league_of_legends/state' # Burn first request.
-        Start-Sleep 10
         $attempts = 50
         While ($True) {
             $state = Invoke-RiotRequest $LCU_LOCKFILE '/lol-patch/v1/products/league_of_legends/state'

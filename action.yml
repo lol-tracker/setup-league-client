@@ -21,7 +21,7 @@ inputs:
     description: 'Wait untill full game installation?'
     required: false
     default: false
-    type: string
+    type: bool
 outputs:
   rcs-password:
     description: "The Riot Client Session Password. It's NOT your account password."

@@ -27,7 +27,7 @@ SOFTWARE.
 $REGION_LOWER = $env:LOL_REGION.ToLower()
 $REGION_UPPER = $env:LOL_REGION.ToUpper()
 
-$FULL_INSTALL = $env:FULL_INSTALL
+$FULL_INSTALL = $env:FULL_INSTALL == 'true'
 
 # Config.
 $INSTALLER_EXE = "$env:RUNNER_TEMP\install.$REGION_LOWER.exe"
@@ -178,7 +178,7 @@ Try {
 	& $LCU_EXE $LCU_ARGS
     Start-Sleep 15
 
-    If ($FULL_INSTALL) {
+    If ($FULL_INSTALL -Eq $True) {
         # Wait for LCU to update itself.
         Invoke-RiotRequest $LCU_LOCKFILE '/lol-patch/v1/products/league_of_legends/state' # Burn first request.
         Start-Sleep 10

@@ -201,6 +201,9 @@ Try {
 
 }
 
+$version = Invoke-RiotRequest $LCU_LOCKFILE '/lol-patch/v1/products/league_of_legends/state'
+echo "lol-version=$version" >> $env:GITHUB_OUTPUT
+
 $lockContent = Get-Content $RCS_LOCKFILE -Raw
 $lockContent = $lockContent.Split(':')
 $port = $lockContent[2];

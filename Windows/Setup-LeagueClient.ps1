@@ -176,7 +176,7 @@ Try {
 	
     Write-Host 'Starting the LCU.'
 	& $LCU_EXE $LCU_ARGS
-    Start-Sleep 15
+    Start-Sleep 5
 
     Invoke-RiotRequest $LCU_LOCKFILE '/lol-patch/v1/products/league_of_legends/state' # Burn first request.
     Start-Sleep 10

@@ -20,7 +20,7 @@ inputs:
   full-install:
     description: 'Wait untill full game installation?'
     required: false
-    default: false
+    default: true
     type: bool
 outputs:
   rcs-password:
@@ -41,9 +41,6 @@ outputs:
   lcu-directory:
     description: 'The League Client Installation Directory.'
     value: ${{ steps.install.outputs.lcu-directory }}
-  lol-version:
-    description: 'League of Legends version.'
-    value: ${{ steps.install.outputs.lol-version }}
 
 runs:
   using: "composite"

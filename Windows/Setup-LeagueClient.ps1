@@ -186,10 +186,14 @@ Try {
         $attempts = 50
         While ($True) {
             $state = Invoke-RiotRequest $LCU_LOCKFILE '/lol-patch/v1/products/league_of_legends/state'
-            Write-Host "LCU updating: $($state.action)" # Not that useful.
             If ('Idle' -Eq $state.action) {
                 Break
             }
+
+            $mbps = $state.components[0].progress.network.bytesPerSecond / 1000
+            $left = $state.components[0].progress.total.bytesRequired - $state.components[0].progress.total.bytesComplete
+            $progress = [int](([float]$state.components[0].progress.total.bytesRequired / [float]$state.components[0].progress.total.bytesComplete) * 100)
+            Write-Host "LCU updating: $($progress)% (${left} bytes left - ${mbps} mbps)" # Not that useful.
 
             If ($attempts -le 0) {
                 Throw 'LCU failed to update.'
@@ -201,10 +205,6 @@ Try {
 } Finally {
 
 }
-
-$version = Invoke-RiotRequest $LCU_LOCKFILE '/lol-patch/v1/game-version'
-Write-Host "lol-version = $version"
-echo "lol-version=$version" >> $env:GITHUB_OUTPUT
 
 $lockContent = Get-Content $RCS_LOCKFILE -Raw
 $lockContent = $lockContent.Split(':')

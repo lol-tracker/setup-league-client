@@ -190,7 +190,7 @@ Try {
                 Break
             }
 
-            $mbps = [int]($state.components[0].progress.network.bytesPerSecond / 1000)
+            $mbps = [int]($state.components[0].progress.network.bytesPerSecond / 1000000)
             $left = $state.components[0].progress.total.bytesRequired - $state.components[0].progress.total.bytesComplete
             $progress = $(If ($state.components[0].progress.total.bytesRequired -Gt 0) { [int](([float]$state.components[0].progress.total.bytesComplete / [float]$state.components[0].progress.total.bytesRequired) * 100) } Else { 0 })
             Write-Host "LCU updating: $($progress)% (${left} bytes left - ${mbps} mbps)" # Not that useful.

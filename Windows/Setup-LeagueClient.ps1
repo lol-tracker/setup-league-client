@@ -158,12 +158,18 @@ Write-Host 'Starting RCS (via LCU).'
 Start-Sleep 5 # Wait for RCS to load so it doesn't overwrite system.yaml.
 
 Try {
+    Write-Host 'Accepting EULA.'
+    Invoke-RiotRequest $RCS_LOCKFILE '/eula/v1/agreement/acceptance' 'PUT'
     Start-Sleep 5
 
     # Login to RCS to start the LCU.
     Write-Host 'Logging into RCS.'
     Invoke-RiotRequest $RCS_LOCKFILE '/rso-auth/v1/authorization/gas' 'POST' @{username=$env:LOL_USERNAME; password=$env:LOL_PASSWORD} | Out-Null
     Start-Sleep 10
+
+    Write-Host 'Accepting EULA.'
+    Invoke-RiotRequest $RCS_LOCKFILE '/eula/v1/agreement/acceptance' 'PUT'
+    Start-Sleep 5
 
     Write-Host 'Flashing the LCU.'
 	& $LCU_EXE $LCU_ARGS

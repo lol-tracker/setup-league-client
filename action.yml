@@ -46,6 +46,9 @@ outputs:
   lcu-directory:
     description: 'The League Client Installation Directory.'
     value: ${{ steps.install.outputs.lcu-directory }}
+  pengu-directory:
+    description: 'Pengu Loader installation directory.'
+    value: ${{ steps.install.outputs.pengu-directory }}
 
 runs:
   using: "composite"

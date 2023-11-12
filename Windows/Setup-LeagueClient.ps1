@@ -55,6 +55,8 @@ $PATCHER_EXE = "$PATCHER_DIR\lcu-patcher.exe"
 
 $LOL_INSTALL_ID = 'league_of_legends.live'
 
+echo "pengu-directory=$PENGU_DIR" >> $env:GITHUB_OUTPUT
+
 function Stop-RiotProcesses {
     # Stop any existing processes.
     Stop-Process -Name 'RiotClientUx' -ErrorAction Ignore

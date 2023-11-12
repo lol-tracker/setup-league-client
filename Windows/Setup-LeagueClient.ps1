@@ -28,6 +28,9 @@ $REGION_LOWER = $env:LOL_REGION.ToLower()
 $REGION_UPPER = $env:LOL_REGION.ToUpper()
 
 $FULL_INSTALL = $env:FULL_INSTALL -Eq 'true'
+$INSTALL_PENGU = $env:INSTALL_PENGU -Eq 'true'
+Write-Host "Full install: $FULL_INSTALL"
+Write-Host "Install pengu: $INSTALL_PENGU" 
 
 # Config.
 $INSTALLER_EXE = "$env:RUNNER_TEMP\install.$REGION_LOWER.exe"
@@ -41,6 +44,10 @@ $LCU_DIR = 'C:\Riot Games\League of Legends'
 $LCU_LOCKFILE = "$LCU_DIR\lockfile"
 $LCU_EXE = "$LCU_DIR\LeagueClient.exe"
 $LCU_ARGS = "--region=$REGION_UPPER"
+
+$PENGU_PATH = "$env:TEMP\pengu-loader.zip"
+$PENGU_DIR = "$env:TEMP\pengu-loader"
+$PENGU_EXE = "$PENGU_DIR\Pengu Loader.exe"
 
 $PATCHER_PATH = "$env:TEMP\lcu-patcher.zip"
 $PATCHER_DIR = "$env:TEMP\lcu-patcher"
@@ -150,6 +157,13 @@ If (-Not (Test-Path $LCU_EXE)) {
 }
 Else {
     Write-Host 'LoL already installed.'
+}
+
+if ($INSTALL_PENGU -Eq $True) {
+	Write-Host 'Installing pengu.'
+	Invoke-WebRequest 'https://github.com/PenguLoader/PenguLoader/releases/download/v1.1.0/pengu-loader-v1.1.0.zip' -OutFile $PENGU_PATH
+	Expand-Archive $PENGU_PATH -DestinationPath $PENGU_DIR -Force
+	& $PENGU_EXE --install
 }
 
 # Start RCS.

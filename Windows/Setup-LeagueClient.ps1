@@ -165,7 +165,10 @@ if ($INSTALL_PENGU -Eq $True) {
 	Write-Host 'Installing pengu.'
 	Invoke-WebRequest 'https://github.com/PenguLoader/PenguLoader/releases/download/v1.1.0/pengu-loader-v1.1.0.zip' -OutFile $PENGU_PATH
 	Expand-Archive $PENGU_PATH -DestinationPath $PENGU_DIR -Force
+
+	Push-Location $PENGU_DIR
 	& $PENGU_EXE --install
+	Pop-Location
 }
 
 # Start RCS.

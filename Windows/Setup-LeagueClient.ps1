@@ -26,11 +26,21 @@ SOFTWARE.
 
 $REGION_LOWER = $env:LOL_REGION.ToLower()
 $REGION_UPPER = $env:LOL_REGION.ToUpper()
+$PATCHLINE_LOWER = $env:LOL_PATCHLINE.ToLower()
+
+$CONFIG_LOWER = $env:LOL_CONFIG
+If ($CONFIG_LOWER -Eq $null -Or $CONFIG_LOWER -Eq '') {
+	$CONFIG_LOWER = $REGION_LOWER
+} else {
+	$CONFIG_LOWER = $CONFIG_LOWER.ToLower()
+}
+
+# temporary debug
+Write-Host "CONFIG_LOWER: $CONFIG_LOWER"
+Write-Host "PATCHLINE_LOWER: $PATCHLINE_LOWER"
 
 $FULL_INSTALL = $env:FULL_INSTALL -Eq 'true'
 $INSTALL_PENGU = $env:INSTALL_PENGU -Eq 'true'
-Write-Host "Full install: $FULL_INSTALL"
-Write-Host "Install pengu: $INSTALL_PENGU" 
 
 # Config.
 $INSTALLER_EXE = "$env:RUNNER_TEMP\install.$REGION_LOWER.exe"
@@ -38,7 +48,7 @@ $INSTALLER_EXE = "$env:RUNNER_TEMP\install.$REGION_LOWER.exe"
 $RCS_LOCKFILE = "$env:LOCALAPPDATA\Riot Games\Riot Client\Config\lockfile"
 $RCS_DIR = "C:\Riot Games\Riot Client"
 $RCS_EXE = "$RCS_DIR\RiotClientServices.exe"
-$RCS_ARGS = '--launch-product=league_of_legends', '--launch-patchline=live', "--region=$REGION_UPPER"
+$RCS_ARGS = '--launch-product=league_of_legends', "--launch-patchline=$PATCHLINE_LOWER", "--region=$REGION_UPPER"
 
 $LCU_DIR = 'C:\Riot Games\League of Legends'
 $LCU_LOCKFILE = "$LCU_DIR\lockfile"
@@ -53,7 +63,7 @@ $PATCHER_PATH = "$env:TEMP\lcu-patcher.zip"
 $PATCHER_DIR = "$env:TEMP\lcu-patcher"
 $PATCHER_EXE = "$PATCHER_DIR\lcu-patcher.exe"
 
-$LOL_INSTALL_ID = 'league_of_legends.live'
+$LOL_INSTALL_ID = "league_of_legends.$PATCHLINE_LOWER"
 
 echo "pengu-directory=$PENGU_DIR" >> $env:GITHUB_OUTPUT
 
@@ -115,7 +125,7 @@ If (-Not (Test-Path $LCU_EXE)) {
     $attempts = 5
     While ($True) {
         Try {
-            Invoke-WebRequest "https://lol.secure.dyn.riotcdn.net/channels/public/x/installer/current/live.$REGION_LOWER.exe" -OutFile $INSTALLER_EXE
+            Invoke-WebRequest "https://lol.secure.dyn.riotcdn.net/channels/public/x/installer/current/$PATCHLINE_LOWER.$CONFIG_LOWER.exe" -OutFile $INSTALLER_EXE
             Break
         }
         Catch {

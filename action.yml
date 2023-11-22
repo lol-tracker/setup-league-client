@@ -17,6 +17,16 @@ inputs:
     description: 'The region of the League of Legends account, e.g. "NA".'
     required: true
     type: string
+  patchline:
+    description: 'League of Legends patchline.'
+    required: false
+    default: 'live'
+    type: string
+  config:
+    description: 'Config name. Most of the time is the same as region.'
+    required: false
+    default: ''
+    type: string
   full-install:
     description: 'Wait untill full game installation?'
     required: false
@@ -68,5 +78,7 @@ runs:
         LOL_USERNAME: ${{ inputs.username }}
         LOL_PASSWORD: ${{ inputs.password }}
         LOL_REGION: ${{ inputs.region }}
+        LOL_PATCHLINE: $${{ inputs.patchline }}
+        LOL_CONFIG: ${{ inputs.config }}
         FULL_INSTALL: ${{ inputs.full-install }}
         INSTALL_PENGU: ${{ inputs.install-pengu }}

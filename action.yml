@@ -78,7 +78,7 @@ runs:
         LOL_USERNAME: ${{ inputs.username }}
         LOL_PASSWORD: ${{ inputs.password }}
         LOL_REGION: ${{ inputs.region }}
-        LOL_PATCHLINE: $${{ inputs.patchline }}
+        LOL_PATCHLINE: ${{ inputs.patchline }}
         LOL_CONFIG: ${{ inputs.config }}
         FULL_INSTALL: ${{ inputs.full-install }}
         INSTALL_PENGU: ${{ inputs.install-pengu }}

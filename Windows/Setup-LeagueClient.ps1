@@ -50,9 +50,8 @@ $RCS_DIR = "C:\Riot Games\Riot Client"
 $RCS_EXE = "$RCS_DIR\RiotClientServices.exe"
 $RCS_ARGS = '--launch-product=league_of_legends', "--launch-patchline=$PATCHLINE_LOWER", "--region=$REGION_UPPER"
 
-$LCU_DIR = 'C:\Riot Games\League of Legends'
-$LCU_LOCKFILE = "$LCU_DIR\lockfile"
-$LCU_EXE = "$LCU_DIR\LeagueClient.exe"
+$LCU_TYPICAL_DIR = 'C:\Riot Games\League of Legends'
+$LCU_TYPICAL_EXE = "$LCU_TYPICAL_DIR\LeagueClient.exe"
 $LCU_ARGS = "--region=$REGION_UPPER"
 
 $PENGU_PATH = "$env:TEMP\pengu-loader.zip"
@@ -119,7 +118,7 @@ function Invoke-RiotRequest {
 Stop-RiotProcesses
 
 # Install League if not installed.
-If (-Not (Test-Path $LCU_EXE)) {
+If (-Not (Test-Path $LCU_TYPICAL_EXE)) {
     Write-Host 'Installing LoL.'
 
     $attempts = 5
@@ -164,6 +163,13 @@ If (-Not (Test-Path $LCU_EXE)) {
         Start-Sleep 20
     }
     Write-Host 'LoL installed successfully.'
+
+    # dynamically fetch lcu path
+    $info = Invoke-RiotRequest $RCS_LOCKFILE "/patch/v1/installs/$LOL_INSTALL_ID/"
+    $LCU_DIR = $info.path
+    $LCU_LOCKFILE = "$LCU_DIR\lockfile"
+    $LCU_EXE = "$LCU_DIR\LeagueClient.exe"
+
     Start-Sleep 1
     Stop-RiotProcesses
 }

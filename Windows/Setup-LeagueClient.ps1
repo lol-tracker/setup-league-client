@@ -184,9 +184,14 @@ if ($INSTALL_PENGU -Eq $True) {
 	Pop-Location
 }
 
+Write-Host 'Downloading lcu-patcher...'
+Invoke-WebRequest 'https://github.com/lol-tracker/lcu-patcher/releases/download/release/lcu-patcher-win64.zip' -OutFile $PATCHER_PATH
+Expand-Archive $PATCHER_PATH -DestinationPath $PATCHER_DIR -Force
+& $PATCHER_EXE $LCU_EXE
+
 # Start RCS.
 Write-Host 'Starting RCS.'
-& $RCS_EXE $RCS_ARGS
+& $RCS_EXE
 
 Start-Sleep 5 # Wait for RCS to load so it doesn't overwrite system.yaml.
 
@@ -199,11 +204,6 @@ Start-Sleep 10
 Write-Host 'Accepting EULA.'
 Invoke-RiotRequest $RCS_LOCKFILE '/eula/v1/agreement/acceptance' 'PUT'
 Start-Sleep 5
-
-Write-Host 'Downloading lcu-patcher...'
-Invoke-WebRequest 'https://github.com/lol-tracker/lcu-patcher/releases/download/release/lcu-patcher-win64.zip' -OutFile $PATCHER_PATH
-Expand-Archive $PATCHER_PATH -DestinationPath $PATCHER_DIR -Force
-& $PATCHER_EXE $LCU_EXE
 
 Write-Host 'Starting the LCU.'
 Invoke-RiotRequest $RCS_LOCKFILE "/product-launcher/v1/products/league_of_legends/patchlines/$PATCHLINE_LOWER" 'POST'

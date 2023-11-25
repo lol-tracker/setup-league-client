@@ -48,11 +48,9 @@ $INSTALLER_EXE = "$env:RUNNER_TEMP\install.$REGION_LOWER.exe"
 $RCS_LOCKFILE = "$env:LOCALAPPDATA\Riot Games\Riot Client\Config\lockfile"
 $RCS_DIR = "C:\Riot Games\Riot Client"
 $RCS_EXE = "$RCS_DIR\RiotClientServices.exe"
-$RCS_ARGS = '--launch-product=league_of_legends', "--launch-patchline=$PATCHLINE_LOWER", "--region=$REGION_UPPER"
 
-$LCU_TYPICAL_DIR = 'C:\Riot Games\League of Legends'
-$LCU_TYPICAL_EXE = "$LCU_TYPICAL_DIR\LeagueClient.exe"
-$LCU_ARGS = "--region=$REGION_UPPER"
+$RCS_ARGS = '--launch-product=league_of_legends', "--launch-patchline=$PATCHLINE_LOWER", "--region=$REGION_UPPER"
+# $LCU_ARGS = "--region=$REGION_UPPER"
 
 $PENGU_PATH = "$env:TEMP\pengu-loader.zip"
 $PENGU_DIR = "$env:TEMP\pengu-loader"
@@ -121,65 +119,60 @@ function Invoke-RiotRequest {
 # Stop any existing processes.
 Stop-RiotProcesses
 
-# Install League if not installed.
-If (-Not (Test-Path $LCU_TYPICAL_EXE)) {
-    Write-Host 'Installing LoL.'
+# Install League.
+Write-Host 'Installing LoL.'
 
-    $attempts = 5
-    While ($True) {
-        Try {
-            Invoke-WebRequest "https://lol.secure.dyn.riotcdn.net/channels/public/x/installer/current/$PATCHLINE_LOWER.$CONFIG_LOWER.exe" -OutFile $INSTALLER_EXE
-            Break
-        }
-        Catch {
-            $attempts--;
-            If ($attempts -le 0) {
-                Write-Host "Failed download LoL installer."
-                Throw $_
-            }
-            Start-Sleep 5
-        }
+$attempts = 5
+While ($True) {
+    Try {
+        Invoke-WebRequest "https://lol.secure.dyn.riotcdn.net/channels/public/x/installer/current/$PATCHLINE_LOWER.$CONFIG_LOWER.exe" -OutFile $INSTALLER_EXE
+        Break
     }
-    
-    Invoke-Expression "$INSTALLER_EXE --skip-to-install"
-
-    # RCS starts, but install of LoL hangs, possibly due to .NET Framework 3.5 missing.
-    # So we restart it and then it works.
-    Invoke-RiotRequest $RCS_LOCKFILE '/patch/v1/installs'
-    Stop-RiotProcesses
-
-    Write-Host 'Restarting RCS'
-    & $RCS_EXE $RCS_ARGS
-    Start-Sleep 5
-
-    #$attempts = 15
-    While ($True) {
-        $status = Invoke-RiotRequest $RCS_LOCKFILE "/patch/v1/installs/$LOL_INSTALL_ID/status"
-        If ('up_to_date' -Eq $status.patch.state) {
-            Break
+    Catch {
+        $attempts--;
+        If ($attempts -le 0) {
+            Write-Host "Failed download LoL installer."
+            Throw $_
         }
-        Write-Host "Installing LoL: $($status.patch.progress.progress)%"
-
-        #If ($attempts -Le 0) {
-        #    Throw 'Failed to install LoL.'
-        #}
-        #$attempts--
-        Start-Sleep 20
+        Start-Sleep 5
     }
-    Write-Host 'LoL installed successfully.'
-
-    # dynamically fetch lcu path
-    $info = Invoke-RiotRequest $RCS_LOCKFILE "/patch/v1/installs/$LOL_INSTALL_ID/"
-    $LCU_DIR = $info.path
-    $LCU_LOCKFILE = "$LCU_DIR\lockfile"
-    $LCU_EXE = "$LCU_DIR\LeagueClient.exe"
-
-    Start-Sleep 1
-    Stop-RiotProcesses
 }
-Else {
-    Write-Host 'LoL already installed.'
+
+Invoke-Expression "$INSTALLER_EXE --skip-to-install"
+
+# RCS starts, but install of LoL hangs, possibly due to .NET Framework 3.5 missing.
+# So we restart it and then it works.
+Invoke-RiotRequest $RCS_LOCKFILE '/patch/v1/installs'
+Stop-RiotProcesses
+
+Write-Host 'Restarting RCS'
+& $RCS_EXE $RCS_ARGS
+Start-Sleep 5
+
+#$attempts = 15
+While ($True) {
+    $status = Invoke-RiotRequest $RCS_LOCKFILE "/patch/v1/installs/$LOL_INSTALL_ID/status"
+    If ('up_to_date' -Eq $status.patch.state) {
+        Break
+    }
+    Write-Host "Installing LoL: $($status.patch.progress.progress)%"
+
+    #If ($attempts -Le 0) {
+    #    Throw 'Failed to install LoL.'
+    #}
+    #$attempts--
+    Start-Sleep 20
 }
+Write-Host 'LoL installed successfully.'
+
+# dynamically fetch lcu path
+$info = Invoke-RiotRequest $RCS_LOCKFILE "/patch/v1/installs/$LOL_INSTALL_ID/"
+$LCU_DIR = $info.path
+$LCU_LOCKFILE = "$LCU_DIR\lockfile"
+$LCU_EXE = "$LCU_DIR\LeagueClient.exe"
+
+Start-Sleep 1
+Stop-RiotProcesses
 
 if ($INSTALL_PENGU -Eq $True) {
 	Write-Host 'Installing pengu.'
@@ -191,60 +184,54 @@ if ($INSTALL_PENGU -Eq $True) {
 	Pop-Location
 }
 
+Write-Host 'Downloading lcu-patcher...'
+Invoke-WebRequest 'https://github.com/lol-tracker/lcu-patcher/releases/download/release/lcu-patcher-win64.zip' -OutFile $PATCHER_PATH
+Expand-Archive $PATCHER_PATH -DestinationPath $PATCHER_DIR -Force
+& $PATCHER_EXE $LCU_EXE
+
 # Start RCS.
-Write-Host 'Starting RCS (via LCU).'
-& $LCU_EXE $LCU_ARGS
+Write-Host 'Starting RCS.'
+& $RCS_EXE
+
 Start-Sleep 5 # Wait for RCS to load so it doesn't overwrite system.yaml.
 
-Try {
-    # Login to RCS to start the LCU.
-    Write-Host 'Logging into RCS.'
-    Invoke-RiotRequest $RCS_LOCKFILE '/rso-auth/v1/authorization/gas' 'POST' @{username=$env:LOL_USERNAME; password=$env:LOL_PASSWORD} | Out-Null
-    Start-Sleep 10
+# Login to RCS to start the LCU.
+Write-Host 'Logging into RCS.'
+Invoke-RiotRequest $RCS_LOCKFILE '/rso-auth/v1/authorization/gas' 'POST' @{username=$env:LOL_USERNAME; password=$env:LOL_PASSWORD} | Out-Null
+Start-Sleep 10
 
-    Write-Host 'Accepting EULA.'
-    Invoke-RiotRequest $RCS_LOCKFILE '/eula/v1/agreement/acceptance' 'PUT'
-    Start-Sleep 5
+# FIXME: do we even need to accept eula if we now launch game using endpoint?
+Write-Host 'Accepting EULA.'
+Invoke-RiotRequest $RCS_LOCKFILE '/eula/v1/agreement/acceptance' 'PUT'
+Start-Sleep 5
 
-    Write-Host 'Flashing the LCU.'
-	& $LCU_EXE $LCU_ARGS
-    Start-Sleep 1
-	
-	Write-Host 'Downloading lcu-patcher...'
-	Invoke-WebRequest 'https://github.com/lol-tracker/lcu-patcher/releases/download/release/lcu-patcher-win64.zip' -OutFile $PATCHER_PATH
-	Expand-Archive $PATCHER_PATH -DestinationPath $PATCHER_DIR -Force
-	& $PATCHER_EXE $LCU_EXE
-	
-    Write-Host 'Starting the LCU.'
-	& $LCU_EXE $LCU_ARGS
-    Start-Sleep 5
+Write-Host 'Starting the LCU.'
+Invoke-RiotRequest $RCS_LOCKFILE "/product-launcher/v1/products/league_of_legends/patchlines/$PATCHLINE_LOWER" 'POST'
+Start-Sleep 5
 
-    Invoke-RiotRequest $LCU_LOCKFILE '/lol-patch/v1/products/league_of_legends/state' # Burn first request.
-    Start-Sleep 10
+Invoke-RiotRequest $LCU_LOCKFILE '/lol-patch/v1/products/league_of_legends/state' # Burn first request.
+Start-Sleep 10
 
-    If ($FULL_INSTALL -Eq $True) {
-        # Wait for LCU to update itself.
-        $attempts = 50
-        While ($True) {
-            $state = Invoke-RiotRequest $LCU_LOCKFILE '/lol-patch/v1/products/league_of_legends/state'
-            If ('Idle' -Eq $state.action) {
-                Break
-            }
-
-            $mbps = [int]($state.components[0].progress.network.bytesPerSecond / 1000000)
-            $left = $state.components[0].progress.total.bytesRequired - $state.components[0].progress.total.bytesComplete
-            $progress = $(If ($state.components[0].progress.total.bytesRequired -Gt 0) { [int](([float]$state.components[0].progress.total.bytesComplete / [float]$state.components[0].progress.total.bytesRequired) * 100) } Else { 0 })
-            Write-Host "LCU updating: $($progress)% (${left} bytes left - ${mbps} mbps)" # Not that useful.
-
-            If ($attempts -le 0) {
-                Throw 'LCU failed to update.'
-            }
-            $attempts--
-            Start-Sleep 20
+If ($FULL_INSTALL -Eq $True) {
+    # Wait for LCU to update itself.
+    $attempts = 50
+    While ($True) {
+        $state = Invoke-RiotRequest $LCU_LOCKFILE '/lol-patch/v1/products/league_of_legends/state'
+        If ('Idle' -Eq $state.action) {
+            Break
         }
-    }
-} Finally {
 
+        $mbps = [int]($state.components[0].progress.network.bytesPerSecond / 1000000)
+        $left = $state.components[0].progress.total.bytesRequired - $state.components[0].progress.total.bytesComplete
+        $progress = $(If ($state.components[0].progress.total.bytesRequired -Gt 0) { [int](([float]$state.components[0].progress.total.bytesComplete / [float]$state.components[0].progress.total.bytesRequired) * 100) } Else { 0 })
+        Write-Host "LCU updating: $($progress)% (${left} bytes left - ${mbps} mbps)" # Not that useful.
+
+        If ($attempts -le 0) {
+            Throw 'LCU failed to update.'
+        }
+        $attempts--
+        Start-Sleep 20
+    }
 }
 
 $lockContent = Get-Content $RCS_LOCKFILE -Raw

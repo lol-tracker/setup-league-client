@@ -206,9 +206,9 @@ Try {
     Invoke-RiotRequest $RCS_LOCKFILE '/eula/v1/agreement/acceptance' 'PUT'
     Start-Sleep 5
 
-    # Write-Host 'Flashing the LCU.'
-	# & $LCU_EXE $LCU_ARGS
-    # Start-Sleep 1
+    Write-Host 'Flashing the LCU.'
+	& $LCU_EXE $LCU_ARGS
+    Start-Sleep 1
 	
 	Write-Host 'Downloading lcu-patcher...'
 	Invoke-WebRequest 'https://github.com/lol-tracker/lcu-patcher/releases/download/release/lcu-patcher-win64.zip' -OutFile $PATCHER_PATH

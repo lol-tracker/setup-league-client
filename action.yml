@@ -86,6 +86,6 @@ runs:
         INPUT_REGION: ${{ inputs.region }}
         INPUT_PATCHLINE: ${{ inputs.patchline }}
         INPUT_CONFIG: ${{ inputs.config }}
-        INPUT_FULL_INSTALL: ${{ inputs.full-install }}
-        INPUT_INSTALL_PENGU: ${{ inputs.install-pengu }}
-        INPUT_IS_DEBUG: ${{ inputs.is-debug }}
+        INPUT_FULL-INSTALL: ${{ inputs.full-install }}
+        INPUT_INSTALL-PENGU: ${{ inputs.install-pengu }}
+        INPUT_IS-DEBUG: ${{ inputs.is-debug }}

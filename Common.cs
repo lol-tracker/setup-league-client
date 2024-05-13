@@ -7,4 +7,10 @@ public static class Common
         using var fs = File.OpenWrite(path);
         await stream.CopyToAsync(fs);
     }
+
+    public static async Task WaitForFileAsync(string path)
+    {
+        while (!File.Exists(path))
+            await Task.Delay(TimeSpan.FromMilliseconds(500));
+    }
 }

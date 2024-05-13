@@ -54,6 +54,7 @@ const string LOL_PRODUCT_ID = "league_of_legends";
 
 var temp = Environment.GetEnvironmentVariable("RUNNER_TEMP")!;
 var localAppdata = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+var programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
 
 logger.LogInformation("Downloading installer...");
 
@@ -70,6 +71,12 @@ logger.LogInformation("Installing Riot Client...");
     await process.WaitForExitAsync();
 }
 
+logger.LogDebug("Done. Waiting for RiotClientInstalls.json...");
+
+// Wait for RiotClientInstalls.json to be created.
+var rciPath = Path.Join(programData, "Riot Games", "RiotClientInstalls.json");
+await Common.WaitForFileAsync(rciPath);
+
 logger.LogInformation("Closing Riot Client...");
 {
     var tasks = Process.GetProcessesByName("RiotClientServices").Select(process =>
@@ -82,8 +89,17 @@ logger.LogInformation("Closing Riot Client...");
 
 logger.LogInformation("Locating Riot Client...");
 
-var rcsDir = @"C:\Riot Games\Riot Client";
-var rcsPath = Path.Join(rcsDir, "RiotClientServices.exe");
+async Task<string> GetRiotClientPath()
+{
+    // NOTE: We can also probably enumerate currently running processes and get the path from there?
+
+    using var fs = File.OpenRead(rciPath);
+
+    var installs = await JsonSerializer.DeserializeAsync<JsonNode>(fs);
+    return installs!["rc_default"]!.GetValue<string>(); // TODO: Make sure it works for PBE
+}
+var rcsPath = await GetRiotClientPath();
+var rcsDir = Path.GetDirectoryName(rcsPath)!;
 var rcsLockfile = Path.Join(localAppdata, "Riot Games", "Riot Client", "lockfile");
 
 logger.LogInformation("Downloading and running LeagueNoVGK...");
@@ -100,8 +116,7 @@ var leagueNoVgkPath = Path.Join(temp, "league-no-vgk.exe");
     Process.Start(leagueNoVgkPath);
 
     // Wait untill lockfile is created.
-    while (!File.Exists(rcsLockfile))
-        await Task.Delay(TimeSpan.FromMilliseconds(500));
+    await Common.WaitForFileAsync(rcsLockfile);
 }
 
 var rcsAPI = await API.CreateAsync(rcsLockfile);

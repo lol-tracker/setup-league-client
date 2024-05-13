@@ -9,7 +9,12 @@ public class API
 
     private API(string username, string password, int port)
     {
-        _Client = new HttpClient();
+        var handler = new HttpClientHandler()
+        {
+            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+        };
+
+        _Client = new HttpClient(handler);
         _Client.BaseAddress = new Uri($"https://127.0.0.1:{port}");
 
         var auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}")));

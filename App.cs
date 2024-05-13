@@ -20,7 +20,7 @@ using var loggerFactory = LoggerFactory.Create(builder => builder
         .AddSimpleConsole(options =>
         {
             options.SingleLine = true;
-            options.TimestampFormat = "HH:mm:ss";
+            options.TimestampFormat = "HH:mm:ss ";
         }));
 
 var logger = loggerFactory.CreateLogger("App");

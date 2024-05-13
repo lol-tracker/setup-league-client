@@ -82,19 +82,8 @@ logger.LogInformation("Closing Riot Client...");
 
 logger.LogInformation("Locating Riot Client...");
 
-async Task<string> GetRiotClientPath()
-{
-    // NOTE: We can also probably enumerate currently running processes and get the path from there?
-
-    var programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-    var path = Path.Join(programData, "Riot Games", "RiotClientInstalls.json");
-    using var fs = File.OpenRead(path);
-
-    var installs = await JsonSerializer.DeserializeAsync<JsonNode>(fs);
-    return installs!["rc_default"]!.GetValue<string>(); // TODO: Make sure it works for PBE
-}
-var rcsPath = await GetRiotClientPath();
-var rcsDir = Path.GetDirectoryName(rcsPath)!;
+var rcsDir = @"C:\Riot Games\Riot Client";
+var rcsPath = Path.Join(rcsDir, "RiotClientServices.exe");
 var rcsLockfile = Path.Join(localAppdata, "Riot Games", "Riot Client", "lockfile");
 
 logger.LogInformation("Downloading and running LeagueNoVGK...");

@@ -73,19 +73,10 @@ runs:
       uses: actions/github-script@v6
       with:
         script: core.setFailed('This action must be run on Windows!')
-
-    - name: Setup League Client on Windows
-      if: ${{ runner.os == 'Windows' }}
+    - name: Restore dependencies
+      shell: cmd
+      run: dotnet restore
+    - name: Setup League of Legends
       id: install
       shell: cmd
-      run: |
-        dotnet restore
-        dotnet run
-      env:
-        LOL_USERNAME: ${{ inputs.username }}
-        LOL_PASSWORD: ${{ inputs.password }}
-        LOL_REGION: ${{ inputs.region }}
-        LOL_PATCHLINE: ${{ inputs.patchline }}
-        LOL_CONFIG: ${{ inputs.config }}
-        FULL_INSTALL: ${{ inputs.full-install }}
-        INSTALL_PENGU: ${{ inputs.install-pengu }}
+      run: dotnet run

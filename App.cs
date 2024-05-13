@@ -4,12 +4,6 @@ using Actions.Core.Extensions;
 using Actions.Core.Services;
 using System.Diagnostics;
 
-// Obtain logger
-using var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
-var logger = loggerFactory.CreateLogger("App");
-
-logger.LogInformation("Initializing...");
-
 // Create services
 using var services = new ServiceCollection()
     .AddGitHubActionsCore()
@@ -17,29 +11,36 @@ using var services = new ServiceCollection()
 
 var core = services.GetRequiredService<ICoreService>();
 
+Console.WriteLine("is-debug input: " + core.GetInput("is-debug"));
+var is_debug = core.GetBoolInput("is-debug");
+
+// Obtain logger
+using var loggerFactory = LoggerFactory.Create(builder => builder
+        .SetMinimumLevel(is_debug ? LogLevel.Debug : LogLevel.Information)
+        .AddConsole());
+
+var logger = loggerFactory.CreateLogger("App");
+logger.LogInformation("Initializing...");
+
 // Get inputs
 var region = core.GetInput("region");
 var patchline = core.GetInput("patchline");
 var config = core.GetInput("config");
 var full_install = core.GetBoolInput("full-install");
 var install_pengu = core.GetBoolInput("install-pengu");
-var is_debug = core.GetBoolInput("is-debug");
 
 // if config is not set than it is the same as region
 if (String.IsNullOrWhiteSpace(config))
     config = region;
 
 // Print input values if debug
-ILogger? debugLogger = null;
 if (is_debug)
 {
-    debugLogger = loggerFactory.CreateLogger("Debug");
-
-    debugLogger.LogInformation($"Region: {region}");
-    debugLogger.LogInformation($"Patchline: {patchline}");
-    debugLogger.LogInformation($"Config: {config}");
-    debugLogger.LogInformation($"Full install: {full_install}");
-    debugLogger.LogInformation($"Install pengu: {install_pengu}");
+    logger.LogDebug($"Region: {region}");
+    logger.LogDebug($"Patchline: {patchline}");
+    logger.LogDebug($"Config: {config}");
+    logger.LogDebug($"Full install: {full_install}");
+    logger.LogDebug($"Install pengu: {install_pengu}");
 }
 
 const string LOL_PRODUCT_ID = "league_of_legends";

@@ -18,7 +18,9 @@ public class API
 
     public static async Task<API> CreateAsync(string lockfilePath)
     {
-        var content = await File.ReadAllTextAsync(lockfilePath);
+        using var fs = File.Open(lockfilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+        using var sr = new StreamReader(fs);
+        var content = await sr.ReadToEndAsync();
         var parts = content.Split(':');
 
         return new API("riot", parts[3], int.Parse(parts[2]));

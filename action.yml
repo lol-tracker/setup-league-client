@@ -80,12 +80,12 @@ runs:
       id: install
       shell: cmd
       run: dotnet run
-      with:
-        username: ${{ inputs.username }}
-        password: ${{ inputs.password }}
-        region: ${{ inputs.region }}
-        patchline: ${{ inputs.patchline }}
-        config: ${{ inputs.config }}
-        full-install: ${{ inputs.full-install }}
-        install-pengu: ${{ inputs.install-pengu }}
-        is-debug: ${{ inputs.is-debug }}
+      env: # github what the fuck
+        INPUT_USERNAME: ${{ inputs.username }}
+        INPUT_PASSWORD: ${{ inputs.password }}
+        INPUT_REGION: ${{ inputs.region }}
+        INPUT_PATCHLINE: ${{ inputs.patchline }}
+        INPUT_CONFIG: ${{ inputs.config }}
+        INPUT_FULL_INSTALL: ${{ inputs.full-install }}
+        INPUT_INSTALL_PENGU: ${{ inputs.install-pengu }}
+        INPUT_IS_DEBUG: ${{ inputs.is-debug }}

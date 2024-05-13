@@ -10,8 +10,6 @@ using var services = new ServiceCollection()
     .BuildServiceProvider();
 
 var core = services.GetRequiredService<ICoreService>();
-
-Console.WriteLine("is-debug input: " + core.GetInput("is-debug"));
 var is_debug = core.GetBoolInput("is-debug");
 
 // Obtain logger
@@ -23,7 +21,9 @@ var logger = loggerFactory.CreateLogger("App");
 logger.LogInformation("Initializing...");
 
 // Get inputs
-var region = core.GetInput("region");
+var username = core.GetInput("username", new(Required: true));
+var password = core.GetInput("password", new(Required: true));
+var region = core.GetInput("region", new(Required: true));
 var patchline = core.GetInput("patchline");
 var config = core.GetInput("config");
 var full_install = core.GetBoolInput("full-install");
@@ -33,15 +33,16 @@ var install_pengu = core.GetBoolInput("install-pengu");
 if (String.IsNullOrWhiteSpace(config))
     config = region;
 
+// Set default patchline
+if (String.IsNullOrWhiteSpace(patchline))
+    patchline = "live";
+
 // Print input values if debug
-if (is_debug)
-{
-    logger.LogDebug($"Region: {region}");
-    logger.LogDebug($"Patchline: {patchline}");
-    logger.LogDebug($"Config: {config}");
-    logger.LogDebug($"Full install: {full_install}");
-    logger.LogDebug($"Install pengu: {install_pengu}");
-}
+logger.LogDebug($"Region: {region}");
+logger.LogDebug($"Patchline: {patchline}");
+logger.LogDebug($"Config: {config}");
+logger.LogDebug($"Full install: {full_install}");
+logger.LogDebug($"Install pengu: {install_pengu}");
 
 const string LOL_PRODUCT_ID = "league_of_legends";
 

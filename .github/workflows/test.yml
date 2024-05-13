@@ -13,6 +13,7 @@ jobs:
           username: ${{ secrets.LOL_USERNAME }}
           password: ${{ secrets.LOL_PASSWORD }}
           region: ${{ secrets.LOL_REGION }}
+          debug: true
 
       - name: Test outputs
         uses: actions/github-script@v6

@@ -37,6 +37,11 @@ inputs:
     required: false
     default: false
     type: boolean
+  is-debug:
+    description: 'Print debug information?'
+    required: false
+    default: false
+    type: boolean
 outputs:
   rcs-password:
     description: "The Riot Client Session Password. It's NOT your account password."
@@ -72,8 +77,10 @@ runs:
     - name: Setup League Client on Windows
       if: ${{ runner.os == 'Windows' }}
       id: install
-      shell: pwsh
-      run: '& $env:GITHUB_ACTION_PATH/Windows/Setup-LeagueClient.ps1'
+      run: |
+        cd $env:GITHUB_ACTION_PATH
+        dotnet restore
+        dotnet run
       env:
         LOL_USERNAME: ${{ inputs.username }}
         LOL_PASSWORD: ${{ inputs.password }}

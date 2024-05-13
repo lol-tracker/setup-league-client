@@ -102,6 +102,10 @@ var rcsPath = await GetRiotClientPath();
 var rcsDir = Path.GetDirectoryName(rcsPath)!;
 var rcsLockfile = Path.Join(localAppdata, "Riot Games", "Riot Client", "lockfile");
 
+logger.LogDebug($"Riot Client path: {rcsPath}");
+logger.LogDebug($"Riot Client directory: {rcsDir}");
+logger.LogDebug($"Riot Client lockfile: {rcsLockfile}");
+
 logger.LogInformation("Downloading and running LeagueNoVGK...");
 
 var leagueNoVgkPath = Path.Join(temp, "league-no-vgk.exe");
@@ -113,17 +117,21 @@ var leagueNoVgkPath = Path.Join(temp, "league-no-vgk.exe");
     File.Delete(rcsLockfile);
 
     // Start process normally
-    Process.Start(leagueNoVgkPath);
+    new Process()
+    {
+        StartInfo = new ProcessStartInfo()
+        {
+            FileName = leagueNoVgkPath,
+            UseShellExecute = true,
+            CreateNoWindow = true,
+        }
+    }.Start();
 
     // Wait untill lockfile is created.
     await Common.WaitForFileAsync(rcsLockfile);
 }
 
 var rcsAPI = await API.CreateAsync(rcsLockfile);
-
-logger.LogDebug($"Riot Client path: {rcsPath}");
-logger.LogDebug($"Riot Client directory: {rcsDir}");
-logger.LogDebug($"Riot Client lockfile: {rcsLockfile}");
 
 logger.LogInformation("Installing League Client...");
 {
@@ -139,6 +147,8 @@ logger.LogInformation("Installing League Client...");
         await Task.Delay(TimeSpan.FromSeconds(15));
     }
 }
+
+// ==================================================
 
 logger.LogDebug("Installed!");
 

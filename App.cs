@@ -115,7 +115,6 @@ var leagueNoVgkPath = Path.Join(temp, "league-no-vgk.exe");
 
     // Delete lockfile so we can wait when its created again.
     File.Delete(rcsLockfile);
-    await Task.Delay(TimeSpan.FromMilliseconds(100));
 
     // Start process normally
     new Process()
@@ -129,9 +128,10 @@ var leagueNoVgkPath = Path.Join(temp, "league-no-vgk.exe");
     }.Start();
 
     // Wait untill lockfile is created.
-    logger.LogDebug("Waiting for lockfile...");
     await Common.WaitForFileAsync(rcsLockfile);
-    logger.LogDebug("done");
+
+    // Wait 1 second to make sure the lockfile is written.
+    await Task.Delay(TimeSpan.FromSeconds(1));
 }
 
 var rcsAPI = await API.CreateAsync(rcsLockfile);

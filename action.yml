@@ -77,8 +77,8 @@ runs:
     - name: Setup League Client on Windows
       if: ${{ runner.os == 'Windows' }}
       id: install
+      working-directory: {{ env.GITHUB_ACTION_PATH }}
       run: |
-        cd $env:GITHUB_ACTION_PATH
         dotnet restore
         dotnet run
       env:

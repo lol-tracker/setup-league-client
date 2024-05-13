@@ -3,6 +3,8 @@ using Microsoft.Extensions.Logging;
 using Actions.Core.Extensions;
 using Actions.Core.Services;
 using System.Diagnostics;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 // Create services
 using var services = new ServiceCollection()
@@ -49,22 +51,96 @@ const string LOL_PRODUCT_ID = "league_of_legends";
 var temp = Environment.GetEnvironmentVariable("RUNNER_TEMP")!;
 var localAppdata = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
+logger.LogInformation("Downloading installer...");
+
 var installerPath = Path.Join(temp, $"install.{region}.exe");
 var installID = $"{LOL_PRODUCT_ID}.{patchline.ToLower()}";
-
-logger.LogInformation("Downloading installer...");
 {
     var url = $"https://lol.secure.dyn.riotcdn.net/channels/public/x/installer/current/{patchline.ToLower()}.{config.ToLower()}.exe";
-    using var client = new HttpClient();
-    using var stream = await client.GetStreamAsync(url);
-    using var fs = File.OpenWrite(installerPath);
-    await stream.CopyToAsync(fs);
+    await Common.DownloadFileAsync(url, installerPath);
 }
 
-logger.LogInformation("Installing...");
+logger.LogInformation("Installing Riot Client...");
 {
     var process = Process.Start(installerPath, ["--skip-to-install"]);
     await process.WaitForExitAsync();
 }
+
+logger.LogInformation("Closing Riot Client...");
+{
+    var tasks = Process.GetProcessesByName("RiotClientServices").Select(process =>
+    {
+        process.Kill();
+        return process.WaitForExitAsync();
+    });
+    await Task.WhenAll(tasks);
+}
+
+logger.LogInformation("Locating Riot Client...");
+
+async Task<string> GetRiotClientPath()
+{
+    // NOTE: We can also probably enumerate currently running processes and get the path from there?
+
+    var programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+    var path = Path.Join(programData, "Riot Games", "RiotClientInstalls.json");
+    using var fs = File.OpenRead(path);
+
+    var installs = await JsonSerializer.DeserializeAsync<JsonNode>(fs);
+    return installs!["rc_default"]!.GetValue<string>(); // TODO: Make sure it works for PBE
+}
+var rcsPath = await GetRiotClientPath();
+var rcsDir = Path.GetDirectoryName(rcsPath)!;
+var rcsLockfile = Path.Join(localAppdata, "Riot Games", "Riot Client", "lockfile");
+
+logger.LogInformation("Downloading and running LeagueNoVGK...");
+
+var leagueNoVgkPath = Path.Join(temp, "league-no-vgk.exe");
+{
+    var url = "https://github.com/User344/LeagueNoVGK/releases/download/Latest/league-no-vgk.exe";
+    await Common.DownloadFileAsync(url, leagueNoVgkPath);
+
+    // Delete lockfile so we can wait when its created again.
+    File.Delete(rcsLockfile);
+
+    // Start process normally
+    Process.Start(leagueNoVgkPath);
+
+    // Wait untill lockfile is created.
+    while (!File.Exists(rcsLockfile))
+        await Task.Delay(TimeSpan.FromMilliseconds(500));
+}
+
+var rcsAPI = await API.CreateAsync(rcsLockfile);
+
+logger.LogDebug($"Riot Client path: {rcsPath}");
+logger.LogDebug($"Riot Client directory: {rcsDir}");
+logger.LogDebug($"Riot Client lockfile: {rcsLockfile}");
+
+logger.LogInformation("Installing League Client...");
+{
+    while (true)
+    {
+        var status = await rcsAPI.GetJSONAsync($"/patch/v1/installs/{installID}/status");
+        if (status!["patch"]!["state"]!.GetValue<string>() == "up_to_date")
+            break;
+
+        var progress = status!["patch"]!["progress"]!["progress"]!.GetValue<int>();
+        logger.LogInformation($"Installing League Client... {progress}%", progress);
+
+        await Task.Delay(TimeSpan.FromSeconds(15));
+    }
+}
+
+logger.LogDebug("Installed!");
+
+async Task<string> GetLeagueClientPath()
+{
+    var install = await rcsAPI.GetJSONAsync($"/patch/v1/installs/{installID}");
+    return install!["path"]!.GetValue<string>();
+}
+var lcsPath = await GetLeagueClientPath();
+
+logger.LogDebug($"League Client path: {lcsPath}");
 
 logger.LogInformation("Done!");

@@ -6,6 +6,8 @@ jobs:
     name: Test the action
     runs-on: windows-latest
     steps:
+      - name: Checking out
+        uses: actions/checkout@v3
       - name: Setup the League Client
         id: league-client
         uses: ./

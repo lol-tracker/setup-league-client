@@ -17,7 +17,11 @@ var is_debug = core.GetBoolInput("is-debug");
 // Obtain logger
 using var loggerFactory = LoggerFactory.Create(builder => builder
         .SetMinimumLevel(is_debug ? LogLevel.Debug : LogLevel.Information)
-        .AddConsole());
+        .AddSimpleConsole(options =>
+        {
+            options.SingleLine = true;
+            options.TimestampFormat = "HH:mm:ss";
+        }));
 
 var logger = loggerFactory.CreateLogger("App");
 logger.LogInformation("Initializing...");

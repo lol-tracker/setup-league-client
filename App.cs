@@ -100,7 +100,7 @@ async Task<string> GetRiotClientPath()
 }
 var rcsPath = await GetRiotClientPath();
 var rcsDir = Path.GetDirectoryName(rcsPath)!;
-var rcsLockfile = Path.Join(localAppdata, "Riot Games", "Riot Client", "lockfile");
+var rcsLockfile = Path.Join(localAppdata, "Riot Games", "Riot Client", "Config", "lockfile");
 
 logger.LogDebug($"Riot Client path: {rcsPath}");
 logger.LogDebug($"Riot Client directory: {rcsDir}");

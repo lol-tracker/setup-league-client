@@ -38,7 +38,14 @@ public class API
 
     public async Task<JsonNode?> GetJSONAsync(string url, CancellationToken cancellationToken = default)
     {
-        var stream = await _Client.GetStreamAsync(url, cancellationToken);
-        return await JsonSerializer.DeserializeAsync<JsonNode>(stream, JsonSerializerOptions.Default, cancellationToken);
+        try
+        {
+            var stream = await _Client.GetStreamAsync(url, cancellationToken);
+            return await JsonSerializer.DeserializeAsync<JsonNode>(stream, JsonSerializerOptions.Default, cancellationToken);
+        }
+        catch
+        {
+            return null;
+        }
     }
 }

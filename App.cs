@@ -141,8 +141,18 @@ logger.LogInformation("Installing League Client...");
     while (true)
     {
         var status = await rcsAPI.GetJSONAsync($"/patch/v1/installs/{installID}/status");
+        if (status is null)
+        {
+            logger.LogWarning("Failed to get status. Retrying...");
+            await Task.Delay(TimeSpan.FromSeconds(1));
+            continue;
+        }
+
         if (status!["patch"]!["state"]!.GetValue<string>() == "up_to_date")
+        {
+            logger.LogInformation("Successfully installed!");
             break;
+        }
 
         var progress = status!["patch"]!["progress"]!["progress"]!.GetValue<float>();
         logger.LogInformation($"Installing League Client... {progress}%", progress);
@@ -152,8 +162,6 @@ logger.LogInformation("Installing League Client...");
 }
 
 // ==================================================
-
-logger.LogDebug("Installed!");
 
 async Task<string> GetLeagueClientPath()
 {

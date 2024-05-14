@@ -38,14 +38,14 @@ public class API
 
     public async Task<JsonNode?> GetJSONAsync(string url, CancellationToken cancellationToken = default)
     {
-        try
+        var response = await _Client.GetAsync(url, cancellationToken);
+        if (!response.IsSuccessStatusCode)
         {
-            var stream = await _Client.GetStreamAsync(url, cancellationToken);
-            return await JsonSerializer.DeserializeAsync<JsonNode>(stream, JsonSerializerOptions.Default, cancellationToken);
+            var content = response.Content.ReadAsStringAsync();
+            throw new Exception($"Unsuccessfull response code: ${response.StatusCode}. Content: ${content}");
         }
-        catch
-        {
-            return null;
-        }
+
+        var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+        return await JsonSerializer.DeserializeAsync<JsonNode>(stream, JsonSerializerOptions.Default, cancellationToken);
     }
 }

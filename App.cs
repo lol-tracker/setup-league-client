@@ -144,7 +144,7 @@ logger.LogInformation("Installing League Client...");
         if (status!["patch"]!["state"]!.GetValue<string>() == "up_to_date")
             break;
 
-        var progress = status!["patch"]!["progress"]!["progress"]!.GetValue<int>();
+        var progress = status!["patch"]!["progress"]!["progress"]!.GetValue<float>();
         logger.LogInformation($"Installing League Client... {progress}%", progress);
 
         await Task.Delay(TimeSpan.FromSeconds(15));

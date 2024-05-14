@@ -144,6 +144,7 @@ logger.LogInformation("Installing League Client...");
         if (status is null)
         {
             logger.LogWarning("Failed to get status. Retrying...");
+            logger.LogDebug("Number of RCS open: " + Process.GetProcessesByName("RiotClientServices").Length);
             await Task.Delay(TimeSpan.FromSeconds(1));
             continue;
         }

@@ -41,8 +41,8 @@ public class API
         var response = await _Client.GetAsync(url, cancellationToken);
         if (!response.IsSuccessStatusCode)
         {
-            var content = response.Content.ReadAsStringAsync();
-            throw new Exception($"Unsuccessfull response code: ${response.StatusCode}. Content: ${content}");
+            var content = await response.Content.ReadAsStringAsync();
+            throw new Exception($"Unsuccessfull response code: {response.StatusCode}. Content: {content}");
         }
 
         var stream = await response.Content.ReadAsStreamAsync(cancellationToken);

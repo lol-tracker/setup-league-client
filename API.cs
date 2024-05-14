@@ -31,6 +31,15 @@ public class API
         return new API("riot", parts[3], int.Parse(parts[2]));
     }
 
+    private async Task HandleResponse(HttpResponseMessage response)
+    {
+        if (response.IsSuccessStatusCode)
+            return;
+
+        var content = await response.Content.ReadAsStringAsync();
+        throw new Exception($"Unsuccessfull response code: {response.StatusCode}. Content: {content}");
+    }
+
     public Task<string> GetStringAsync(string url, CancellationToken cancellationToken = default)
     {
         return _Client.GetStringAsync(url, cancellationToken);
@@ -39,11 +48,7 @@ public class API
     public async Task<JsonNode?> GetJSONAsync(string url, CancellationToken cancellationToken = default)
     {
         var response = await _Client.GetAsync(url, cancellationToken);
-        if (!response.IsSuccessStatusCode)
-        {
-            var content = await response.Content.ReadAsStringAsync();
-            throw new Exception($"Unsuccessfull response code: {response.StatusCode}. Content: {content}");
-        }
+        await HandleResponse(response);
 
         var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
         return await JsonSerializer.DeserializeAsync<JsonNode>(stream, JsonSerializerOptions.Default, cancellationToken);

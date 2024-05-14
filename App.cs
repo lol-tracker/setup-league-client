@@ -77,16 +77,6 @@ logger.LogDebug("Done. Waiting for RiotClientInstalls.json...");
 var rciPath = Path.Join(programData, "Riot Games", "RiotClientInstalls.json");
 await Common.WaitForFileAsync(rciPath);
 
-logger.LogInformation("Closing Riot Client...");
-{
-    var tasks = Process.GetProcessesByName("RiotClientServices").Select(process =>
-    {
-        process.Kill();
-        return process.WaitForExitAsync();
-    });
-    await Task.WhenAll(tasks);
-}
-
 logger.LogInformation("Locating Riot Client...");
 
 async Task<string> GetRiotClientPath()
@@ -105,6 +95,23 @@ var rcsLockfile = Path.Join(localAppdata, "Riot Games", "Riot Client", "Config",
 logger.LogDebug($"Riot Client path: {rcsPath}");
 logger.LogDebug($"Riot Client directory: {rcsDir}");
 logger.LogDebug($"Riot Client lockfile: {rcsLockfile}");
+
+logger.LogInformation("Burning first request...");
+{
+    await Common.WaitForFileAsync(rcsLockfile);
+    var rcsTempAPI = await API.CreateAsync(rcsLockfile);
+    await rcsTempAPI.GetStringAsync($"/patch/v1/installs");
+}
+
+logger.LogInformation("Closing Riot Client...");
+{
+    var tasks = Process.GetProcessesByName("RiotClientServices").Select(process =>
+    {
+        process.Kill();
+        return process.WaitForExitAsync();
+    });
+    await Task.WhenAll(tasks);
+}
 
 logger.LogInformation("Downloading and running LeagueNoVGK...");
 

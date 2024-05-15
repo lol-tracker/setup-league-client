@@ -298,7 +298,7 @@ logger.LogInformation("Setting output...");
     await core.SetOutputAsync("lcu-port", lockfile.Port);
     await core.SetOutputAsync("lcu-directory", lcuPath);
 
-    await core.SetOutputAsync("pengu-directory", penguPath);
+    await core.SetOutputAsync("pengu-directory", penguDir);
 }
 
 logger.LogInformation("Done!");

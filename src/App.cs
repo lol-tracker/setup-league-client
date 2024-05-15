@@ -76,7 +76,7 @@ logger.LogDebug("Done. Waiting for RiotClientInstalls.json...");
 
 // Wait for RiotClientInstalls.json to be created.
 var rciPath = Path.Join(programData, "Riot Games", "RiotClientInstalls.json");
-await Common.WaitForFileAsync(rciPath);
+await Common.WaitForFileAsync(rciPath, new CancellationTokenSource(TimeSpan.FromMinutes(1)).Token);
 
 logger.LogInformation("Locating Riot Client...");
 
@@ -130,7 +130,7 @@ var leagueNoVgkPath = Path.Join(temp, "league-no-vgk.exe");
     }.Start();
 
     // Wait untill lockfile is created.
-    await Common.WaitForFileAsync(rcsLockfile);
+    await Common.WaitForFileAsync(rcsLockfile, new CancellationTokenSource(TimeSpan.FromMinutes(1)).Token);
 
     // Wait 1 second to make sure the lockfile is written.
     await Task.Delay(TimeSpan.FromSeconds(1));
@@ -248,7 +248,7 @@ logger.LogInformation("Accepting EULA...");
 /*     await Task.Delay(TimeSpan.FromSeconds(5)); */
 /* } */
 
-await Common.WaitForFileAsync(lcuLockfile);
+await Common.WaitForFileAsync(lcuLockfile, new CancellationTokenSource(TimeSpan.FromMinutes(1)).Token);
 
 var lcuAPI = await API.CreateAsync(lcuLockfile);
 await Task.Delay(TimeSpan.FromSeconds(10));

@@ -75,9 +75,11 @@ runs:
         script: core.setFailed('This action must be run on Windows!')
     - name: Restore dependencies
       shell: cmd
+      working-directory: src
       run: dotnet restore
     - name: Setup League of Legends
       id: install
+      working-directory: src
       shell: cmd
       run: dotnet run
       env: # github what the fuck

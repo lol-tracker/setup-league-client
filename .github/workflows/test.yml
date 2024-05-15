@@ -1,5 +1,5 @@
 name: Test
-on: workflow_dispatch
+on: [workflow_dispatch, push]
 concurrency: lol
 jobs:
   install:

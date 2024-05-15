@@ -78,7 +78,6 @@ runs:
       run: dotnet restore src/setup-league-client.csproj
     - name: Setup League of Legends
       id: install
-      working-directory: src
       shell: cmd
       run: dotnet run src/setup-league-client.csproj
       env: # github what the fuck

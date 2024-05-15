@@ -239,14 +239,14 @@ logger.LogInformation("Accepting EULA...");
     await Task.Delay(TimeSpan.FromSeconds(5));
 }
 
-logger.LogDebug("Deleting old LCU lockfile...");
-File.Delete(lcuLockfile);
-
-logger.LogInformation("Starting LCU...");
-{
-    await rcsAPI.PostAsync($"/product-launcher/v1/products/league_of_legends/patchlines/{patchline}");
-    await Task.Delay(TimeSpan.FromSeconds(5));
-}
+/* logger.LogDebug("Deleting old LCU lockfile..."); */
+/* File.Delete(lcuLockfile); */
+/**/
+/* logger.LogInformation("Starting LCU..."); */
+/* { */
+/*     await rcsAPI.PostAsync($"/product-launcher/v1/products/league_of_legends/patchlines/{patchline}"); */
+/*     await Task.Delay(TimeSpan.FromSeconds(5)); */
+/* } */
 
 await Common.WaitForFileAsync(lcuLockfile);
 

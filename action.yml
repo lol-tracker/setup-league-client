@@ -75,11 +75,13 @@ runs:
         script: core.setFailed('This action must be run on Windows!')
     - name: Restore dependencies
       shell: cmd
-      run: dotnet restore src/setup-league-client.csproj
+      working-directory: ${{ github.action_path }}
+      run: dotnet restore
     - name: Setup League of Legends
       id: install
+      working-directory: ${{ github.action_path }}
       shell: cmd
-      run: dotnet run src/setup-league-client.csproj
+      run: dotnet run
       env: # github what the fuck
         INPUT_USERNAME: ${{ inputs.username }}
         INPUT_PASSWORD: ${{ inputs.password }}

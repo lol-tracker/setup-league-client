@@ -23,12 +23,9 @@ public class API
 
     public static async Task<API> CreateAsync(string lockfilePath)
     {
-        using var fs = File.Open(lockfilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
-        using var sr = new StreamReader(fs);
-        var content = await sr.ReadToEndAsync();
-        var parts = content.Split(':');
+        var lockfile = await Lockfile.CreateAsync(lockfilePath);
 
-        return new API("riot", parts[3], int.Parse(parts[2]));
+        return new API("riot", lockfile.Password, int.Parse(lockfile.Port));
     }
 
     private async Task HandleResponse(HttpResponseMessage response)
@@ -40,9 +37,28 @@ public class API
         throw new Exception($"Unsuccessfull response code: {response.StatusCode}. Content: {content}");
     }
 
-    public Task<string> GetStringAsync(string url, CancellationToken cancellationToken = default)
+    private StringContent? CreateJsonContent(object? body)
     {
-        return _Client.GetStringAsync(url, cancellationToken);
+        if (body is null)
+            return null;
+
+        var bodySerialized = JsonSerializer.Serialize(body);
+        var mediaType = MediaTypeHeaderValue.Parse("application/json");
+        return new StringContent(bodySerialized, mediaType);
+    }
+
+    public async Task GetAsync(string url, CancellationToken cancellationToken = default)
+    {
+        var response = await _Client.GetAsync(url, cancellationToken);
+        await HandleResponse(response);
+    }
+
+    public async Task<string> GetStringAsync(string url, CancellationToken cancellationToken = default)
+    {
+        var response = await _Client.GetAsync(url, cancellationToken);
+        await HandleResponse(response);
+
+        return await response.Content.ReadAsStringAsync(cancellationToken);
     }
 
     public async Task<JsonNode?> GetJSONAsync(string url, CancellationToken cancellationToken = default)
@@ -52,5 +68,19 @@ public class API
 
         var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
         return await JsonSerializer.DeserializeAsync<JsonNode>(stream, JsonSerializerOptions.Default, cancellationToken);
+    }
+
+    public async Task PostAsync(string url, object? body = null, CancellationToken cancellationToken = default)
+    {
+        var content = CreateJsonContent(body);
+        var response = await _Client.PostAsync(url, content, cancellationToken);
+        await HandleResponse(response);
+    }
+
+    public async Task PutAsync(string url, object? body = null, CancellationToken cancellationToken = default)
+    {
+        var content = CreateJsonContent(body);
+        var response = await _Client.PutAsync(url, content, cancellationToken);
+        await HandleResponse(response);
     }
 }

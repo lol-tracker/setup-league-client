@@ -76,7 +76,9 @@ runs:
     - name: Restore dependencies
       shell: cmd
       working-directory: ${{ github.action_path }}
-      run: dotnet restore
+      run: |
+        dir
+        dotnet restore
     - name: Setup League of Legends
       id: install
       working-directory: ${{ github.action_path }}

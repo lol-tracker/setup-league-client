@@ -15,6 +15,9 @@ jobs:
           username: ${{ secrets.LOL_USERNAME }}
           password: ${{ secrets.LOL_PASSWORD }}
           region: ${{ secrets.LOL_REGION }}
+          file_client_settings_content: ${{ secrets.FILE_CLIENT_SETTINGS_CONTENT }}
+          file_private_settings_content: ${{ secrets.FILE_PRIVATE_SETTINGS_CONTENT }}
+          file_cookies_content: ${{ secrets.FILE_COOKIES_CONTENT }}
           is-debug: true
 
       - name: Test outputs

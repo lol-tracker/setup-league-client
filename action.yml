@@ -17,6 +17,21 @@ inputs:
     description: 'The region of the League of Legends account, e.g. "NA".'
     required: true
     type: string
+  file_client_settings_content:
+    description: 'TBD'
+    required: false
+    default: ''
+    type: string
+  file_private_settings_content:
+    description: 'TBD'
+    required: false
+    default: ''
+    type: string
+  file_cookies_content:
+    description: 'TBD'
+    required: false
+    default: ''
+    type: string
   patchline:
     description: 'League of Legends patchline.'
     required: false
@@ -85,9 +100,9 @@ runs:
       env:
         INPUT_USERNAME: ${{ inputs.username }}
         INPUT_PASSWORD: ${{ inputs.password }}
-        INPUT_FILE_CLIENT_SETTINGS_CONTENT: ${{ secrets.FILE_CLIENT_SETTINGS_CONTENT }}
-        INPUT_FILE_PRIVATE_SETTINGS_CONTENT: ${{ secrets.FILE_PRIVATE_SETTINGS_CONTENT }}
-        INPUT_FILE_COOKIES_CONTENT: ${{ secrets.FILE_COOKIES_CONTENT }}
+        INPUT_FILE_CLIENT_SETTINGS_CONTENT: ${{ inputs.file_client_settings_content }}
+        INPUT_FILE_PRIVATE_SETTINGS_CONTENT: ${{ inputs.file_private_settings_content }}
+        INPUT_FILE_COOKIES_CONTENT: ${{ inputs.file_cookies_content }}
         INPUT_REGION: ${{ inputs.region }}
         INPUT_PATCHLINE: ${{ inputs.patchline }}
         INPUT_CONFIG: ${{ inputs.config }}

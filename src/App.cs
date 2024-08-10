@@ -247,7 +247,27 @@ logger.LogInformation("Downloading and running lcu-patcher...");
     }
 }
 
-await Task.Delay(TimeSpan.FromSeconds(5));
+logger.LogInformation("Waiting for RSO to initialize...");
+{
+    async Task<string> WaitForRSO(CancellationToken cancellationToken = default)
+    {
+        while (true)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            try
+            {
+                return await rcsAPI.GetStringAsync("/rso-auth/v1/session");
+            }
+            catch { }
+
+            await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
+        }
+    }
+
+    var session = await WaitForRSO(new CancellationTokenSource(TimeSpan.FromMinutes(1)).Token);
+    logger.LogDebug(session);
+}
 
 /* logger.LogInformation("Logging in..."); */
 /* { */
@@ -258,14 +278,6 @@ await Task.Delay(TimeSpan.FromSeconds(5));
 /*     }); */
 /*     await Task.Delay(TimeSpan.FromSeconds(5)); */
 /* } */
-
-if (is_debug)
-{
-    logger.LogDebug("Auth status:");
-
-    var status = await rcsAPI.GetStringAsync("/rso-auth/v1/session");
-    logger.LogDebug(status);
-}
 
 logger.LogInformation("Accepting EULA...");
 {

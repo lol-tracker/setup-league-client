@@ -107,6 +107,24 @@ logger.LogInformation("Closing Riot Client...");
     await Task.WhenAll(tasks);
 }
 
+logger.LogInformation("Copying settings and cookies...");
+{
+    async Task DecodeAndWrite(string path, string data)
+    {
+        var decoded = Convert.FromBase64String(data);
+        await File.WriteAllBytesAsync(path, decoded);
+    }
+
+    var basePath = Path.Join(localAppdata, "Riot Games", "Riot Client");
+    var tasks = new List<Task>() {
+        DecodeAndWrite(Path.Join(basePath, "Config", "RiotClientSettings.yaml"), core.GetInput("FILE_CLIENT_SETTINGS_CONTENT")),
+        DecodeAndWrite(Path.Join(basePath, "Data", "RiotGamesPrivateSettings.yaml"), core.GetInput("FILE_PRIVATE_SETTINGS_CONTENT")),
+        DecodeAndWrite(Path.Join(basePath, "Config", "Cookies", "Cookie"), core.GetInput("FILE_COOKIES_CONTENT")),
+    };
+
+    await Task.WhenAll(tasks);
+}
+
 logger.LogInformation("Downloading and running LeagueNoVGK...");
 
 var leagueNoVgkPath = Path.Join(temp, "league-no-vgk.exe");
@@ -223,15 +241,15 @@ logger.LogInformation("Downloading and running lcu-patcher...");
     }
 }
 
-logger.LogInformation("Logging in...");
-{
-    await rcsAPI.PostAsync("/rso-auth/v1/authorization/gas", new
-    {
-        username = username,
-        password = password,
-    });
-    await Task.Delay(TimeSpan.FromSeconds(5));
-}
+/* logger.LogInformation("Logging in..."); */
+/* { */
+/*     await rcsAPI.PostAsync("/rso-auth/v1/authorization/gas", new */
+/*     { */
+/*         username = username, */
+/*         password = password, */
+/*     }); */
+/*     await Task.Delay(TimeSpan.FromSeconds(5)); */
+/* } */
 
 logger.LogInformation("Accepting EULA...");
 {

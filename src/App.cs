@@ -112,6 +112,7 @@ logger.LogInformation("Copying settings and cookies...");
     async Task DecodeAndWrite(string path, string data)
     {
         var decoded = Convert.FromBase64String(data);
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
         await File.WriteAllBytesAsync(path, decoded);
     }
 

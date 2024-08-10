@@ -247,6 +247,8 @@ logger.LogInformation("Downloading and running lcu-patcher...");
     }
 }
 
+await Task.Delay(TimeSpan.FromSeconds(5));
+
 /* logger.LogInformation("Logging in..."); */
 /* { */
 /*     await rcsAPI.PostAsync("/rso-auth/v1/authorization/gas", new */

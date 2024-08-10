@@ -112,6 +112,7 @@ logger.LogInformation("Copying settings and cookies...");
     async Task DecodeAndWrite(string path, string data)
     {
         var decoded = Convert.FromBase64String(data);
+        logger.LogDebug($"Writing to \"{path}\" ({data.Length} -> {decoded.Length})");
         Directory.CreateDirectory(Path.GetDirectoryName(path)!);
         await File.WriteAllBytesAsync(path, decoded);
     }
@@ -120,7 +121,7 @@ logger.LogInformation("Copying settings and cookies...");
     var tasks = new List<Task>() {
         DecodeAndWrite(Path.Join(basePath, "Config", "RiotClientSettings.yaml"), core.GetInput("FILE_CLIENT_SETTINGS_CONTENT")),
         DecodeAndWrite(Path.Join(basePath, "Data", "RiotGamesPrivateSettings.yaml"), core.GetInput("FILE_PRIVATE_SETTINGS_CONTENT")),
-        DecodeAndWrite(Path.Join(basePath, "Config", "Cookies", "Cookie"), core.GetInput("FILE_COOKIES_CONTENT")),
+        DecodeAndWrite(Path.Join(basePath, "Config", "Cookies", "Cookies"), core.GetInput("FILE_COOKIES_CONTENT")),
     };
 
     await Task.WhenAll(tasks);

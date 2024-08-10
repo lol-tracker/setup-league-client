@@ -82,9 +82,12 @@ runs:
       working-directory: ${{ github.action_path }}/src
       shell: cmd
       run: dotnet run
-      env: # github what the fuck
+      env:
         INPUT_USERNAME: ${{ inputs.username }}
         INPUT_PASSWORD: ${{ inputs.password }}
+        INPUT_FILE_CLIENT_SETTINGS_CONTENT: ${{ secrets.FILE_CLIENT_SETTINGS_CONTENT }}
+        INPUT_FILE_PRIVATE_SETTINGS_CONTENT: ${{ secrets.FILE_PRIVATE_SETTINGS_CONTENT }}
+        INPUT_FILE_COOKIES_CONTENT: ${{ secrets.FILE_COOKIES_CONTENT }}
         INPUT_REGION: ${{ inputs.region }}
         INPUT_PATCHLINE: ${{ inputs.patchline }}
         INPUT_CONFIG: ${{ inputs.config }}

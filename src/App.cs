@@ -257,6 +257,14 @@ logger.LogInformation("Downloading and running lcu-patcher...");
 /*     await Task.Delay(TimeSpan.FromSeconds(5)); */
 /* } */
 
+if (is_debug)
+{
+    logger.LogDebug("Auth status:");
+
+    var status = await rcsAPI.GetStringAsync("/rso-auth/v1/session");
+    logger.LogDebug(status);
+}
+
 logger.LogInformation("Accepting EULA...");
 {
     await rcsAPI.PutAsync("/eula/v1/agreement/acceptance");

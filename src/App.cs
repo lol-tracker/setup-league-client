@@ -111,17 +111,21 @@ logger.LogInformation("Copying settings and cookies...");
 {
     async Task DecodeAndWrite(string path, string data)
     {
+        if (data.Length == 0)
+            throw new ArgumentException($"Data for file {Path.GetFileName(path)} is empty", nameof(data));
+
         var decoded = Convert.FromBase64String(data);
         logger.LogDebug($"Writing to \"{path}\" ({data.Length} -> {decoded.Length})");
+
         Directory.CreateDirectory(Path.GetDirectoryName(path)!);
         await File.WriteAllBytesAsync(path, decoded);
     }
 
     var basePath = Path.Join(localAppdata, "Riot Games", "Riot Client");
     var tasks = new List<Task>() {
-        DecodeAndWrite(Path.Join(basePath, "Config", "RiotClientSettings.yaml"), core.GetInput("FILE_CLIENT_SETTINGS_CONTENT")),
-        DecodeAndWrite(Path.Join(basePath, "Data", "RiotGamesPrivateSettings.yaml"), core.GetInput("FILE_PRIVATE_SETTINGS_CONTENT")),
-        DecodeAndWrite(Path.Join(basePath, "Config", "Cookies", "Cookies"), core.GetInput("FILE_COOKIES_CONTENT")),
+        DecodeAndWrite(Path.Join(basePath, "Config", "RiotClientSettings.yaml"), core.GetInput("file_client_settings_content", new(Required: true))),
+        DecodeAndWrite(Path.Join(basePath, "Data", "RiotGamesPrivateSettings.yaml"), core.GetInput("file_private_settings_content", new(Required: true))),
+        DecodeAndWrite(Path.Join(basePath, "Data", "Cookies", "Cookies"), core.GetInput("file_cookies_content", new(Required: true))),
     };
 
     await Task.WhenAll(tasks);

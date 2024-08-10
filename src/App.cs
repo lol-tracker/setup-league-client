@@ -208,7 +208,7 @@ if (install_pengu)
 
 logger.LogInformation("Downloading and running lcu-patcher...");
 {
-    var patcherUrl = "https://github.com/lol-tracker/lcu-patcher/releases/download/release/lcu-patcher-win64.zip";
+    var patcherUrl = "https://github.com/lol-tracker/lcu-patcher/releases/download/v1.1.0/lcu-patcher-win64.zip";
     var patcherFilePath = Path.Join(temp, "lcu-patcher.zip");
     var patcherPath = Path.Join(temp, "lcu-patcher");
     var patcherExe = Path.Join(patcherPath, "lcu-patcher.exe");
